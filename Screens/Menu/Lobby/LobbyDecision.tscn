@@ -1,0 +1,135 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Screens/Menu/Lobby/LobbyDecision.gd" type="Script" id=1]
+
+[node name="LobbyDecision" type="CenterContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+
+[node name="HBox" type="HBoxContainer" parent="."]
+margin_left = 412.0
+margin_top = 260.0
+margin_right = 612.0
+margin_bottom = 340.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBox" type="VBoxContainer" parent="HBox"]
+margin_right = 200.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 200, 0 )
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+alignment = 1
+
+[node name="Popup" type="Popup" parent="HBox/VBox"]
+margin_right = 200.0
+
+[node name="Errmsg" type="Label" parent="HBox/VBox/Popup"]
+margin_right = 40.0
+margin_bottom = 14.0
+
+[node name="HBox" type="HBoxContainer" parent="HBox/VBox"]
+margin_right = 200.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="HBox/VBox/HBox"]
+margin_top = 5.0
+margin_right = 78.0
+margin_bottom = 19.0
+text = "Your Name: "
+align = 1
+
+[node name="Name" type="LineEdit" parent="HBox/VBox/HBox"]
+margin_left = 82.0
+margin_right = 200.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+max_length = 13
+caret_blink = true
+caret_blink_speed = 0.5
+
+[node name="Host_Join" type="HBoxContainer" parent="HBox/VBox"]
+margin_top = 28.0
+margin_right = 200.0
+margin_bottom = 80.0
+size_flags_horizontal = 3
+
+[node name="Buttons" type="VBoxContainer" parent="HBox/VBox/Host_Join"]
+margin_right = 42.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.25
+
+[node name="Host" type="Button" parent="HBox/VBox/Host_Join/Buttons"]
+margin_right = 42.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Host"
+
+[node name="Join" type="Button" parent="HBox/VBox/Host_Join/Buttons"]
+margin_top = 28.0
+margin_right = 42.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Join"
+
+[node name="Info" type="VBoxContainer" parent="HBox/VBox/Host_Join"]
+margin_left = 46.0
+margin_right = 200.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+
+[node name="ServerPort" type="LineEdit" parent="HBox/VBox/Host_Join/Info"]
+margin_right = 154.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+align = 1
+placeholder_text = "Port (e.g.: 7979)"
+caret_blink = true
+caret_blink_speed = 0.5
+
+[node name="Address" type="HBoxContainer" parent="HBox/VBox/Host_Join/Info"]
+margin_top = 28.0
+margin_right = 154.0
+margin_bottom = 52.0
+
+[node name="IP" type="LineEdit" parent="HBox/VBox/Host_Join/Info/Address"]
+margin_right = 84.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+text = "127.0.0.1"
+align = 1
+placeholder_text = "IP Address. e.g.: 127.0.0.1"
+caret_blink = true
+caret_blink_speed = 0.5
+
+[node name="Colon" type="Label" parent="HBox/VBox/Host_Join/Info/Address"]
+margin_left = 88.0
+margin_top = 5.0
+margin_right = 92.0
+margin_bottom = 19.0
+text = ":"
+
+[node name="ClientPort" type="LineEdit" parent="HBox/VBox/Host_Join/Info/Address"]
+margin_left = 96.0
+margin_right = 154.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
+align = 1
+placeholder_text = "Port"
+caret_blink = true
+caret_blink_speed = 0.5
+
+[connection signal="pressed" from="HBox/VBox/Host_Join/Buttons/Host" to="." method="_on_Host_pressed"]
+[connection signal="pressed" from="HBox/VBox/Host_Join/Buttons/Join" to="." method="_on_Join_pressed"]

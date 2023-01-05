@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Screens/Menu/Lobby/RFC8489_STUN.gd" type="Script" id=1]
+
+[node name="RFC8489_STUN" type="Node"]
+script = ExtResource( 1 )
+
+[connection signal="external_address_resolved" from="." to="." method="_on_RFC8489_STUN_external_address_resolved"]
+[connection signal="time_out" from="." to="." method="_on_RFC8489_STUN_time_out"]

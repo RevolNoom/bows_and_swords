@@ -1,0 +1,14 @@
+[Gameplay]: Create weapon, sword, bow, claymore, longbow
+
+[Weapon] Can block other weapon with weight
+[Weapon] Sword, claymore: Swing in mouse direction
+[Weapon] Bow, Longbow: Aim in inverted mouse direction. Press and hold to string up.
+[Weapon] Spear: Aim in mouse direction. Press and drag mouse to thrust.
+[Weapon] Halbert: Long, Swing like sword. Thrust like Spear.
+[Weapon] Rope dart: Press & Swirl to spin the dart. Release to throw with force.
+
+[Gameplay]: Create more maps, randomize them
+
+[Network] Some players might wait in the room without playing. Don't send gameplay rpc to them
+
+[GUI] People can watch the on-going match

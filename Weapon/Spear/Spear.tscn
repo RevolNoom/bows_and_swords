@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Weapon/Weapon.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Weapon/Spear/Spear.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 80.5, 2 )
+
+[node name="Spear" instance=ExtResource( 1 )]
+mass = 0.1
+continuous_cd = 1
+contacts_reported = 6
+linear_damp = 0.2
+angular_damp = 5.0
+damage = 40
+
+[node name="Sprite" parent="." index="0"]
+position = Vector2( 29, 0 )
+rotation = 1.5708
+scale = Vector2( 0.11, 0.17 )
+texture = ExtResource( 2 )
+
+[node name="Stabilizer" parent="." index="1"]
+displacement_band_width = 5.0
+displacement_safe_bands = 0.0
+angular_bands = 10.0
+angular_strength = 0.1
+angular_safe_bands = 0.0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." index="2"]
+polygon = PoolVector2Array( 110, -3, 115, -3, 132, 0, 115, 3, 110, 3, 106, 1, 106, -1 )
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="." index="3"]
+polygon = PoolVector2Array( -58, -2, -61, -2, -74, 0, -61, 2, -58, 2, -55, 1, -55, -1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Handle" index="0"]
+position = Vector2( 25.5, 0 )
+shape = SubResource( 1 )

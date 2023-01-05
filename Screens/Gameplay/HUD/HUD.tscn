@@ -1,0 +1,78 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Screens/Gameplay/HUD/Dynamic/SurvivalBar.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Screens/Gameplay/HUD/HUD.gd" type="Script" id=3]
+[ext_resource path="res://Screens/Gameplay/HUD/Dynamic/HealthBarProgress.svg" type="Texture" id=7]
+[ext_resource path="res://Screens/Gameplay/HUD/TopBar.svg" type="Texture" id=8]
+[ext_resource path="res://Screens/Gameplay/HUD/Static/Armor.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Screens/Gameplay/HUD/Static/Speed.tscn" type="PackedScene" id=11]
+
+[node name="HUD" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 3 )
+
+[node name="Top" type="TextureRect" parent="."]
+anchor_right = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource( 8 )
+stretch_mode = 1
+
+[node name="Margin" type="MarginContainer" parent="Top"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Attributes" type="HBoxContainer" parent="Top/Margin"]
+margin_right = 1024.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Dynamic" type="HBoxContainer" parent="Top/Margin/Attributes"]
+margin_right = 544.0
+margin_bottom = 40.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Health" parent="Top/Margin/Attributes/Dynamic" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 544.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="TextureProgress" parent="Top/Margin/Attributes/Dynamic/Health" index="0"]
+margin_left = 180.0
+margin_top = 10.0
+margin_right = 364.0
+margin_bottom = 30.0
+texture_progress = ExtResource( 7 )
+
+[node name="Static" type="HBoxContainer" parent="Top/Margin/Attributes"]
+margin_left = 548.0
+margin_right = 1024.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.75
+
+[node name="Armor" parent="Top/Margin/Attributes/Static" instance=ExtResource( 9 )]
+margin_right = 236.0
+
+[node name="Speed" parent="Top/Margin/Attributes/Static" instance=ExtResource( 11 )]
+margin_left = 240.0
+margin_right = 476.0
+
+[editable path="Top/Margin/Attributes/Dynamic/Health"]

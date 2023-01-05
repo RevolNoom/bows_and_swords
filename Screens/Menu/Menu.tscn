@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Screens/Menu/Lobby/Lobby.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Screens/Menu/Menu.gd" type="Script" id=3]
+
+[node name="Menu" type="CanvasLayer"]
+pause_mode = 2
+script = ExtResource( 3 )
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Lobby" parent="TabContainer" instance=ExtResource( 2 )]
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
