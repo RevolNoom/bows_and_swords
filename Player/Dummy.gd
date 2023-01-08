@@ -10,10 +10,11 @@ signal die(dummy)
 func _ready():
 	var dontcare = GetAttribute("Health").connect("empty", self, "Die", [], CONNECT_ONESHOT)
 	EquipWeapon(load("res://Weapon/Sword/Sword.tscn").instance())
+	#EquipWeapon(load("res://Weapon/Spear/Spear.tscn").instance())
+	#EquipWeapon(load("res://Weapon/Pike/Pike.tscn").instance())
 	
 
 func _integrate_forces(_state):
-	#print($RotationController.GetRange())
 	applied_torque = $RotationController.GetSpinFactor()*GetAttribute("Agility").value
 									
 	
@@ -22,14 +23,12 @@ func GetAttribute(name):
 
 
 func EquipWeapon(weapon):
-	
 	if $RightHand.get_child_count() > 0:
 		var wp = $RightHand.get_child(0)
 		remove_child(wp)
 		wp.queue_free()
 		
-	weapon.add_collision_exception_with(self)
-	weapon.HandledBy(self)
+	weapon.HandledBy(self, $RightHand)
 	$RightHand.add_child(weapon)
 	
 

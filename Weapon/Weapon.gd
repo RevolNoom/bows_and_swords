@@ -5,45 +5,28 @@ extends RigidBody2D
 class_name Weapon
 
 var _handler
+var _handlePoint
 
 
 func _ready():
-	$Handle.add_collision_exception_with(self)
+	$Hitbox.add_collision_exception_with(self)
 	
 	
-func HandledBy(player):
+func HandledBy(player, handle_point):
 	_handler = player
+	_handlePoint = handle_point
 	var mastery = _handler.GetAttribute("Mastery").value
-	$Handle.add_collision_exception_with(player)
+	add_collision_exception_with(player)
+	$Hitbox.add_collision_exception_with(player)
+	
 	
 # NOTE: Modifying global transform work
 # But state.transform does not
 func _integrate_forces(_state):
 	var mastery = _handler.GetAttribute("Mastery").value
-	applied_force = $Stabilizer.StabilizeDisplacement(self, get_parent()) * mastery
-	applied_torque = $Stabilizer.StabilizeAngle(self, _handler) * mastery
+	applied_force = $Stabilizer.StabilizeDisplacement($Stabilizer, _handlePoint) * mastery
+	applied_torque = $Stabilizer.StabilizeAngle($Stabilizer, _handler) * mastery
 	# _restrictAngleBias()
-
-
-func _on_Weapon_body_entered(body):
-	_tryHitDummy(body)
-
-
-func _process(delta):
-	for object in get_colliding_bodies():
-		_tryHitDummy(object)
-
-
-func _tryHitDummy(object):
-	var current_time = Time.get_ticks_msec()
-	if object is Dummy and _hit_cooldown.get(object, 0) + $HitCooldown.value < current_time:
-		object.TakeDamagePhysical($Damage.value, $Piercing.value)
-		_hit_cooldown[object] = current_time
-	
-
-# HitCooldown: Minimal interval between two damaging hits
-# prevents the case when a weapon emits body_entered rapidly.
-var _hit_cooldown = {}
 
 
 # UNUSED
@@ -57,4 +40,6 @@ var _hit_cooldown = {}
 #	if abs(angle_bias) > angle_restrict:
 #		angle_bias = clamp(angle_bias, -angle_restrict, angle_restrict)
 #		global_rotation = _handler.global_rotation - angle_bias
+
+
 

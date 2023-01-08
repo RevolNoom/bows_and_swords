@@ -4,35 +4,40 @@
 [ext_resource path="res://Weapon/Spear/Spear.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 80.5, 2 )
+extents = Vector2( 78.5, 1 )
 
 [node name="Spear" instance=ExtResource( 1 )]
-mass = 0.1
-continuous_cd = 1
+mass = 0.02
 contacts_reported = 6
 linear_damp = 0.2
 angular_damp = 5.0
-damage = 40
 
 [node name="Sprite" parent="." index="0"]
-position = Vector2( 29, 0 )
+position = Vector2( -7, -9.54969e-13 )
 rotation = 1.5708
 scale = Vector2( 0.11, 0.17 )
 texture = ExtResource( 2 )
 
 [node name="Stabilizer" parent="." index="1"]
+position = Vector2( -56, 0 )
 displacement_band_width = 5.0
+displacement_strength = 0.002
 displacement_safe_bands = 0.0
 angular_bands = 10.0
-angular_strength = 0.1
+angular_strength = 0.02
 angular_safe_bands = 0.0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." index="2"]
-polygon = PoolVector2Array( 110, -3, 115, -3, 132, 0, 115, 3, 110, 3, 106, 1, 106, -1 )
+position = Vector2( -47, 0 )
+polygon = PoolVector2Array( 110, -2, 115, -2, 130, 0, 115, 2, 110, 2, 105, 1, 105, -1 )
 
-[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="." index="3"]
-polygon = PoolVector2Array( -58, -2, -61, -2, -74, 0, -61, 2, -58, 2, -55, 1, -55, -1 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Handle" index="0"]
-position = Vector2( 25.5, 0 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="3"]
+position = Vector2( -20.5, 0 )
 shape = SubResource( 1 )
+
+[node name="Hitbox" parent="." index="4"]
+continuous_cd = 1
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="Hitbox" index="0"]
+position = Vector2( -47, 0 )
+polygon = PoolVector2Array( 110, -3, 115, -3, 132, 0, 115, 3, 110, 3, 105, 1, 105, -1 )

@@ -1,10 +1,16 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Weapon/Weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Weapon/Sword/sword.png" type="Texture" id=2]
 
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 9.5, 2 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 1.5, 9 )
+
 [node name="Sword" instance=ExtResource( 1 )]
-mass = 0.04
+mass = 0.01
 angular_damp = -1.0
 
 [node name="Sprite" parent="." index="0"]
@@ -13,15 +19,25 @@ scale = Vector2( 0.056, 0.056 )
 texture = ExtResource( 2 )
 
 [node name="Stabilizer" parent="." index="1"]
-displacement_band_width = 1.0
-displacement_strength = 0.1
-displacement_safe_bands = 10.0
-angular_bands = 10000.0
-angular_strength = 0.001
-angular_safe_bands = 1000.0
+position = Vector2( -19, 0 )
+displacement_band_width = 5.0
+displacement_strength = 0.02
+angular_bands = 5.0
+angular_strength = 0.035
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." index="2"]
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="." index="2"]
+position = Vector2( -20.5, 0 )
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="." index="3"]
+position = Vector2( -9.5, 0 )
+shape = SubResource( 2 )
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="." index="4"]
+polygon = PoolVector2Array( -8, -2, 65, -2, 72, 0, 65, 2, -8, 2 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Hitbox" index="0"]
 polygon = PoolVector2Array( -8, -3, 65, -3, 73, 0, 65, 3, -8, 3 )
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Handle" index="0"]
-polygon = PoolVector2Array( -10, -9, -8, -9, -8, 9, -10, 9, -10, 2, -29, 2, -29, -2, -10, -2 )
+[node name="HitCooldown" parent="." index="8"]
+value = 300.0

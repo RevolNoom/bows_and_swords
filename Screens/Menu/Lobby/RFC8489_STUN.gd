@@ -33,7 +33,6 @@ enum Format{
 	MAGIC_COOKIE		= 0x2112A442,
 }
 
-
 enum Attribute{
 	TYPE				= 0xFFFF0000
 	LENGTH				= 0x0000FFFF
@@ -155,19 +154,36 @@ func _GetXORMappedAddress(attribute):
 # @ip_value is an Array of ints. 
 # 1 int for Attribute.MAPPED_ADDRESS_IPvF 
 # 4 ints for Attribute.MAPPED_ADDRESS_IPvS 
-# TODO: Convert IPv6
+# TODO: Untested
+const EQUIVALENT_HEX = "0123456789abcdef"
 func _ConvertIPValueToString(ip_type, ip_value):
+	var result = ""
 	if ip_type == Attribute.MAPPED_ADDRESS_IPvF:
-		var result = ""
-		for i in range(3, -1, -1):
-			result += str((ip_value[0] & (0xFF << i*8)) >> i*8) + "."
+		print ("IPv4: " + str(ip_value[0]))
+		for i in range(24, -8, -8):
+			result += str((ip_value[0] >> i) & 0xFF) + "."
 		result.erase(result.length() - 1, 1)
 		return result
+		
 	elif ip_type == Attribute.MAPPED_ADDRESS_IPvS:
-		printerr("Conversion to IPv6 not yet implemented")
+		print ("IPv6: " + str(var2bytes(ip_value)))
+		for fourBytes in ip_value:
+			for halfByte in range(28, -4, -4):
+				result += EQUIVALENT_HEX[(fourBytes >> halfByte) & 0xF]
+		for colon_pos in range(28, 0, -4):
+			result.insert(colon_pos, ":")
+		return _shortifyIPvS(result)
+		
 	else:
 		printerr("Unknown ip_type: \"" + str(ip_type) + "\"")
+		return "???Unknown ip type???"
 
+
+#TODO:
+func _shortifyIPvS(ipvs):
+	return ipvs
+	
+	
 
 # Return an array of entries.
 # Each entry is in the form [TYPE, CONTENT]
@@ -183,7 +199,6 @@ func _ExtractAttributes(response: Array):
 	return results
 
 
-	
 func _IsValid(response):
 	if response[0] & Format.ZEROES_PREFIX != 0 or\
 		response[1] & Format.MAGIC_COOKIE != Format.MAGIC_COOKIE or\

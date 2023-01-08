@@ -20,6 +20,7 @@ func SetupClient(player_name, ip, port):
 	if err != OK:
 		emit_signal("error", "Can't connect to " + str(ip) + ":" + str(port))
 		return
+	print("Is client connected? " + str(err == OK))
 		
 	get_tree().network_peer = client
 	
