@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Maps/Colosseum/Arena.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Maps/Map.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Player/Dummy.tscn" type="PackedScene" id=3]
 
 [node name="Colosseum" instance=ExtResource( 2 )]
 
@@ -17,8 +16,6 @@ position = Vector2( 222, -630 )
 
 [node name="2" type="Position2D" parent="SpawnPoint" index="1"]
 position = Vector2( 568, -627 )
-
-[node name="Dummy" parent="SpawnPoint/2" index="0" instance=ExtResource( 3 )]
 
 [node name="3" type="Position2D" parent="SpawnPoint" index="2"]
 position = Vector2( 375, -433 )

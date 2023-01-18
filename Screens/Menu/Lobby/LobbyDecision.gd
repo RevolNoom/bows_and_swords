@@ -3,7 +3,7 @@ extends CenterContainer
 signal host(player_name, port)
 signal join(player_name, ip, port)
 
-export var DEFAULT_PORT = 7979
+export var DEFAULT_PORT = 1025
 
 func _ready():
 	seed(OS.get_unix_time())

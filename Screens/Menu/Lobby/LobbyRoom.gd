@@ -23,6 +23,7 @@ func _ready():
 
 # Send our information over the network
 func _on_Network_peer_connected(id):
+	print("New peer received")
 	rpc_id(id, "CreateEntry", [get_tree().get_network_unique_id()\
 							, get_path_to(_youEntry.get_parent())\
 							, _youEntry.get_name()\

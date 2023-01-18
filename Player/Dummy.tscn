@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Player/Dummy.gd" type="Script" id=1]
 [ext_resource path="res://Player/Wizard.svg" type="Texture" id=2]
 [ext_resource path="res://Player/Attribute.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Player/RotationController.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Weapon/Stabilize.tscn" type="PackedScene" id=4]
+[ext_resource path="res://icon.png" type="Texture" id=5]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 17.7781
@@ -13,7 +14,7 @@ collision_mask = 15
 mass = 0.4
 contact_monitor = true
 linear_damp = 1.0
-angular_damp = 1.0
+angular_damp = 0.2
 script = ExtResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -55,8 +56,23 @@ allow_greater = true
 value = 10.0
 allow_greater = true
 
+[node name="NetworkMasterState" type="RigidBody2D" parent="Attribute"]
+collision_layer = 0
+collision_mask = 0
+mode = 3
+custom_integrator = true
+can_sleep = false
+
+[node name="Sprite" type="Sprite" parent="Attribute/NetworkMasterState"]
+rotation = -1.5708
+scale = Vector2( 0.3, 0.3 )
+texture = ExtResource( 5 )
+
 [node name="RightHand" type="Node2D" parent="."]
 position = Vector2( 19, 16 )
 
-[node name="RotationController" parent="." instance=ExtResource( 5 )]
-_rangeCount = 9
+[node name="Stabilize" parent="." instance=ExtResource( 4 )]
+
+[connection signal="empty" from="Attribute/Health" to="." method="_on_Health_empty"]
+[connection signal="value_changed" from="Attribute/Agility" to="." method="_on_Agility_value_changed"]
+[connection signal="value_changed" from="Attribute/Speed" to="." method="_on_Speed_value_changed"]

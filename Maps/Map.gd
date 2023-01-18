@@ -18,6 +18,7 @@ func LoadPlayers():
 		
 		_players.append(player)
 		$SpawnPoint.get_node(str(spawnpoint)).add_child(player)
+		#print(str(player.get_path())+" after appending to spawn: " + str(player.global_position))
 		spawnpoint += 1
 
 

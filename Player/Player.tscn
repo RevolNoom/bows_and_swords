@@ -4,6 +4,7 @@
 [ext_resource path="res://Player/Player.gd" type="Script" id=2]
 
 [node name="Player" instance=ExtResource( 1 )]
+angular_damp = 0.2
 script = ExtResource( 2 )
 
 [node name="Camera2D" parent="." index="2"]
@@ -11,3 +12,6 @@ current = true
 
 [node name="Speed" parent="Attribute" index="4"]
 value = 50.0
+
+[node name="Stabilize" parent="." index="5"]
+angular_safe_bands = 0.0

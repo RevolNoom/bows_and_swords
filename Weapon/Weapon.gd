@@ -15,20 +15,29 @@ func _ready():
 func HandledBy(player, handle_point):
 	_handler = player
 	_handlePoint = handle_point
-	var mastery = _handler.GetAttribute("Mastery").value
 	add_collision_exception_with(player)
 	$Hitbox.add_collision_exception_with(player)
+	var mastery = _handler.GetAttribute("Mastery").value
 	
 	
 # NOTE: Modifying global transform work
 # But state.transform does not
+# TODO: Move Weapon in addition to Dummy correcting motion
 func _integrate_forces(_state):
 	var mastery = _handler.GetAttribute("Mastery").value
-	applied_force = $Stabilizer.StabilizeDisplacement($Stabilizer, _handlePoint) * mastery
-	applied_torque = $Stabilizer.StabilizeAngle($Stabilizer, _handler) * mastery
-	# _restrictAngleBias()
+	applied_force = $Stabilize.Position($Stabilize.global_position, _handlePoint.global_position) * mastery
+	applied_torque = $Stabilize.Rotation($Stabilize.global_rotation, _handler.global_rotation) * mastery
+	#TODO: Take into account the absolute displacement of weapon
 
 
+func _on_handler_die(_body):
+	visible = false
+	call_deferred("set_collision_layer", 0)
+	call_deferred("set_collision_mask", 0)
+	
+	$Hitbox.call_deferred("set_collision_layer", 0)
+	$Hitbox.call_deferred("set_collision_mask", 0)
+	
 # UNUSED
 #const angle_restrict = PI/2
 #func _restrictAngleBias():

@@ -18,11 +18,11 @@ func SetupClient(player_name, ip, port):
 	var client = NetworkedMultiplayerENet.new()
 	var err = client.create_client(ip, port)
 	if err != OK:
-		emit_signal("error", "Can't connect to " + str(ip) + ":" + str(port))
+		emit_signal("error", "Can't create client to " + str(ip) + " on port" + str(port))
 		return
-	print("Is client connected? " + str(err == OK))
 		
 	get_tree().network_peer = client
+	client.always_ordered = true
 	
 	_youEntry = _entryScene["You"].instance()
 	_youEntry.set_name(player_name)
@@ -39,6 +39,7 @@ func _on_Network_server_disconnected():
 
 
 func _on_Network_server_connected():
+	print("Server_connected")
 	_youEntry.name = str(get_tree().get_network_unique_id())
 	#_youEntry.set_network_master(get_tree().get_network_unique_id())
 

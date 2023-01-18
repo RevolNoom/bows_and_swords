@@ -17,7 +17,18 @@ var _resendLeft
 var _lastTransactionID
 var _pp = PacketPeerUDP.new()
 
-# 64 first header bits
+
+class StunMessage:
+	var first32bit
+	var length
+	var type
+	var method
+	var magicCookie
+	var transactionID
+	var attributes
+
+
+# 32 first header bits
 enum Type{
 	BITS    			= 0x01_10_0000, #0b00_000001_0001_0000_00000000_00000000
 	REQUEST 			= 0x00_00_0000, #0b00_000000_0000_0000_00000000_00000000
@@ -52,8 +63,15 @@ enum Attribute{
 	
 
 func GetExternalAddress(client_port):
-	_pp.listen(client_port)
-	_pp.set_dest_address("stun4.l.google.com", 19302)
+	var err = _pp.listen(client_port)
+	if err != OK:
+		printerr("Can't listen on port " + str(client_port) + ". Error code: " + str(err))
+		return
+	
+	err = _pp.set_dest_address("stun4.l.google.com", 19302)
+	if err != OK:
+		printerr("Failed to set STUN address. Error code: " + str(err))
+		return
 	
 	_timeoutDeadline = Time.get_ticks_msec() + time_out * 1000
 	_resendLeft = maximum_resend
@@ -70,8 +88,17 @@ func _checkForResponse():
 	packet = _pp.get_packet()
 	
 	while _pp.get_packet_error() == OK:
-		if _DissectResponse(packet) == true:
+		var response = _FormulateResponse(packet)
+		if not _IsValid(response):
+			printerr("STUN response is invalid")
 			return
+			
+		for attribute in response.attributes:
+			if attribute[0] == Attribute.XOR_MAPPED_ADDRESS:
+				_GetXORMappedAddress(attribute[1], response)
+			else: #TODO: More Attribute types?
+				print("Attribute not yet implemented: " + str(var2bytes(attribute[0]).subarray(4, 7)))
+		return true
 			
 	if Time.get_ticks_msec() > _timeoutDeadline:
 		_resendLeft = _resendLeft - 1
@@ -100,6 +127,7 @@ func _GenerateNewBindingRequest():
 # Use PoolByteArray.invert() to make them Big Endian.
 func _FormulateHeader(type, method, content_length):
 	
+	# Subarray(4, 7) because Variant contains another 4-byte Type field prefix
 	var zeroes_type_length = var2bytes(\
 								type | method | (content_length & Format.MESSAGE_LENGTH)
 								& ~Format.ZEROES_PREFIX\
@@ -113,40 +141,55 @@ func _FormulateHeader(type, method, content_length):
 	# WARNING: I'm counting on garbage made from resize() to be random enough
 	header.resize(20)
 	_lastTransactionID = _EncodeIntArray(header.subarray(8, 19))
+	#print("sending transaction ID: " + str(_lastTransactionID))
 	
 	return header
 
-
-# Return true if this is the response to STUN request
-func _DissectResponse(response):
-	response = _EncodeIntArray(response)
-	if not _IsValid(response):
-		printerr("STUN response is invalid")
-		return false
 	
-	var attributes = _ExtractAttributes(response)
-	for attr in attributes:
-		if attr[0] == Attribute.XOR_MAPPED_ADDRESS:
-			_GetXORMappedAddress(attr[1])
-		else: #TODO: More Attribute types?
-			print("Attribute not yet implemented: " + str(var2bytes(attr[0])))
-	return true
-			
-			
-func _GetXORMappedAddress(attribute):
+
+func _FormulateResponse(response) -> StunMessage:
+	if response.size() < 5:
+		printerr("STUN response too short! Invalid!")
+		return null
+	response = _EncodeIntArray(response)	
+	var stunMsg = StunMessage.new()
+	stunMsg.first32bit = response[0]
+	stunMsg.type = response[0] & Type.BITS
+	stunMsg.method = response[0] & Method.BITS
+	stunMsg.length = response[0] & Format.MESSAGE_LENGTH
+	stunMsg.magicCookie = response[1]
+	stunMsg.transactionID = response.slice(2, 4)
+	#print("received transaction id: " + str(stunMsg.transactionID))
+	stunMsg.attributes = _ExtractAttributes(response.slice(5, response.size()-1))
+	return stunMsg
+
+
+func _GetXORMappedAddress(attribute, response: StunMessage):
 	var family	= attribute[0] & Attribute.MAPPED_ADDRESS_FML
-	var port	= (attribute[0] & Attribute.MAPPED_ADDRESS_PORT) ^ Format.MAGIC_COOKIE >> 16
-	var xaddress= attribute.slice(1, attribute.size())
+	#print("xport before: " + str((attribute[0] &  Attribute.MAPPED_ADDRESS_PORT)))
+	var xport	= (attribute[0] ^ Attribute.XOR_COOKIE) & Attribute.MAPPED_ADDRESS_PORT
+	#print("xport after: " + str(xport))
+	var xaddress= attribute.slice(1, attribute.size()-1, 1, true)
 
-	
-	for everyFourBytes in xaddress:
-		everyFourBytes = everyFourBytes ^ Attribute.XOR_COOKIE
+	#print("xaddress before: " + str(xaddress))
+	var xor_block = [Format.MAGIC_COOKIE,
+					 response.transactionID[0],
+					 response.transactionID[1],
+					 response.transactionID[2]]
+					
+	for i in range(0, xaddress.size()):
+		xaddress[i] ^= xor_block[i]
+		
+	#print("xaddress after: " + str(xaddress))
 	
 	var resolved_address = _ConvertIPValueToString(family, xaddress)
+	
 	# TODO: WARN: Closing socket here might causes a problem later on when we forget it
 	# As long as we only use this for XOR MAPPED ADDRESS, I guess it'll be fine
+	# Close socket before Menu or Lobby could setup server
 	_CloseSocket()
-	emit_signal("external_address_resolved", resolved_address, port)
+	
+	emit_signal("external_address_resolved", resolved_address, xport)
 
 
 # Convert ip_value to String representation
@@ -166,12 +209,13 @@ func _ConvertIPValueToString(ip_type, ip_value):
 		return result
 		
 	elif ip_type == Attribute.MAPPED_ADDRESS_IPvS:
-		print ("IPv6: " + str(var2bytes(ip_value)))
+		#print ("IPv6: " + str(var2bytes(ip_value)))
 		for fourBytes in ip_value:
 			for halfByte in range(28, -4, -4):
 				result += EQUIVALENT_HEX[(fourBytes >> halfByte) & 0xF]
+		#TODO: Insert without copying
 		for colon_pos in range(28, 0, -4):
-			result.insert(colon_pos, ":")
+			result = result.insert(colon_pos, ":")
 		return _shortifyIPvS(result)
 		
 	else:
@@ -182,15 +226,14 @@ func _ConvertIPValueToString(ip_type, ip_value):
 #TODO:
 func _shortifyIPvS(ipvs):
 	return ipvs
-	
-	
+
 
 # Return an array of entries.
 # Each entry is in the form [TYPE, CONTENT]
 # LENGTH is omitted, as it's already stored in the array CONTENT
 func _ExtractAttributes(response: Array):
 	var results = []
-	var read_head = 5	# Start reading from the 6th integer
+	var read_head = 0
 	while read_head < response.size():
 		var length = response[read_head] & Attribute.LENGTH
 		results.push_back([response[read_head] & Attribute.TYPE,\
@@ -199,12 +242,12 @@ func _ExtractAttributes(response: Array):
 	return results
 
 
-func _IsValid(response):
-	if response[0] & Format.ZEROES_PREFIX != 0 or\
-		response[1] & Format.MAGIC_COOKIE != Format.MAGIC_COOKIE or\
-		response.slice(2, 4) != _lastTransactionID:
-			return false
-	return true
+# Return true if this is the response to STUN request
+# TODO: Check attributes validity
+func _IsValid(response: StunMessage):
+	return response.first32bit & Format.ZEROES_PREFIX == 0 and\
+		response.magicCookie == Format.MAGIC_COOKIE and\
+		response.transactionID == _lastTransactionID
 
 
 # Working with PoolByteArray is too difficult
@@ -221,6 +264,7 @@ func _EncodeIntArray(response: PoolByteArray):
 
 func _on_RFC8489_STUN_external_address_resolved(_ip, _port):
 	_CloseSocket()
+	#pass
 
 
 func _on_RFC8489_STUN_time_out():

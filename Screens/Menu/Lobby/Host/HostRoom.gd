@@ -24,8 +24,14 @@ func SetupServer(player_name, port):
 	
 func _SetupServer(player_name, port):
 	var server = NetworkedMultiplayerENet.new()
-	server.create_server(port, MAX_PLAYERS)
+	var err = server.create_server(port, MAX_PLAYERS)
+	if err != OK:
+		printerr("Server not created. Error code: " + str(err))
+		return
+		
+	print("Server up. Port: " + str(port))
 	get_tree().network_peer = server
+	server.always_ordered = true
 	
 	_youEntry = CreateEntry([1, $Room/PlayQueue.get_path(), player_name, "READY"])
 	_youEntry.connect("exit", self, "_on_You_exit")
@@ -90,7 +96,24 @@ func GetRoomIPs(port):
 func _on_RFC8489_STUN_external_address_resolved(ip, port):
 	#print("External IP resolved")
 	$Room/Controller/State/HBox/IP.get_popup().add_item("External IP: " + ip + ":" + str(port))
-	_SetupServer(_player_name, _port)
+	_port = port
+	_SetupServer(_player_name, port)
+	
+	var err = pku.connect_to_host(ip, port)
+	if err != OK:
+		print("pku failed to connect. Err: "+ str(err))
+		return
+	
+	var timer = get_tree().create_timer(0.1)
+	timer.connect("timeout", self, "_punchThroughNAT")
+
+
+var pku = PacketPeerUDP.new()
+func _punchThroughNAT():
+	var timer = get_tree().create_timer(0.1)
+	timer.connect("timeout", self, "_punchThroughNAT")
+	pku.put_packet(var2bytes("Router port puncher"))
+	print("Punched")
 
 
 func _on_RFC8489_STUN_time_out():
